@@ -1,11 +1,13 @@
 #include "umem.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <stdint.h>
+#include <stddef.h>  
 
 typedef struct BlockF {
     size_t size;
@@ -69,9 +71,22 @@ void* FIRST_AFIT(size_t size) {
 } 
 
 void* NEXT_AFIT(size_t size) {
-  void* ptr = NULL;
-  return ptr;
-} 
+    if (head == NULL) {
+    }
+
+    BlockF *cur = head;
+    while (1) {
+        if (cur->size >= size) {
+            head = cur;
+            return (void *)(cur + 1);
+        }
+        cur = cur->next ? cur->next : head;
+        
+    }
+    return NULL;
+}
+
+
 
 
 int umeminit(size_t sizeOfRegion, int allocationAlgo) {

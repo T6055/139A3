@@ -77,7 +77,6 @@ int main() {
 
     return 0;
 }
-
 // DOES THIS DO THE SAME THING AS UMEMDUMP??
 // void print_free_list(BlockF *list) {
 //     printf("Current free list:\n");

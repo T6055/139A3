@@ -182,14 +182,12 @@ int ufree(void *ptr) {
     BlockF *prev = NULL;
     BlockF *nodeToFree = NULL;
     BlockF *temp = NULL; 
-    
+
     if (ptr != NULL) {
         nodeToFree = (BlockF *)ptr - 1;
-
         // Find the correct position to insert the freed block into the free list
         BlockF *cur = head;
         prev = NULL;
-        
         while (cur != NULL && cur < nodeToFree) {
             prev = cur;
             cur = cur->free_next;

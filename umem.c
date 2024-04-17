@@ -25,18 +25,49 @@ void* BEST_AFIT(size_t size) {
 } 
 
 void* WORST_AFIT(size_t size) {
-  void* ptr = NULL;
-  return ptr;
-} 
+    BlockF *cur = head;
+    BlockF *worst = NULL;
+
+    // Find the worst-fit block
+    while (cur != NULL) {
+        if (cur->size >= size) {
+            if (worst == NULL || cur->size > worst->size) {
+                worst = cur;
+            }
+        }
+        cur = cur->next;
+    }
+    // If a worst-fit block is found, allocate memory from it
+    if (worst != NULL) {
+        // If the worst-fit block is exactly the same size as requested, remove it from the free list
+        if (worst->size == size) {
+            // Update the head if necessary
+            if (worst == head) {
+                head = worst->next;
+            }
+            return worst + 1; // Return a pointer to the allocated memory
+        } else if (worst->size > size) {
+            // If the worst-fit block is larger, split it and allocate from the beginning
+            BlockF *cur = worst;
+            BlockF *newNode = (BlockF *)((char *)cur + size + sizeof(BlockF));
+            newNode->size = cur->size - size - sizeof(BlockF);
+            newNode->next = cur->next;
+            if (worst == head) {
+                head = newNode;
+            }
+            return cur + 1; // Return a pointer to the allocated memory
+        }
+    }
+    // Return NULL if no suitable block is found
+    return NULL;
+}
 
 void* FIRST_AFIT(size_t size) {
-
     if (size <= 0)
         return NULL;
 
     BlockF *prev = NULL;
     BlockF *cur = head;
-
     // Traverse the free list to find a good block
     while (cur != NULL) {
         if (cur->size >= size) {
@@ -56,36 +87,31 @@ void* FIRST_AFIT(size_t size) {
                 head = cur->next;
             else
                 prev->next = cur->next;
-
-            //umemdump();
-
-            // void *ptr = NULL;
             return (void *)(cur + 1); // Pointer to the allocated memory
         }
         prev = cur;
         cur = cur->next;
     }
-
     // Not enough space
     return NULL;
 } 
 
 void* NEXT_AFIT(size_t size) {
-    if (head == NULL) {
-    }
+    if (head == NULL) { // If the free list is empty, there are no blocks to allocate, so return NULL
+        return NULL; 
 
-    BlockF *cur = head;
+    }
+    BlockF *cur = head; // Start the search from the current head of the free list
     while (1) {
-        if (cur->size >= size) {
-            head = cur;
-            return (void *)(cur + 1);
+        if (cur->size >= size) { // If the current block's size is ok to hold the requested sizeallocate from it
+            head = cur; // Update the head of the free list to the current block
+            return (void *)(cur + 1); // Return a pointer to the allocated memory
         }
-        cur = cur->next ? cur->next : head;
-        
+        cur = cur->next ? cur->next : head; 
+        // Move to the next block in the free list, or loop back to the head if we reach the end  
     }
     return NULL;
 }
-
 
 int umeminit(size_t sizeOfRegion, int allocationAlgo) {
     if (head != NULL || sizeOfRegion <= 0) {
@@ -151,7 +177,6 @@ void *umalloc(size_t size) {
 
     return block;
 }
-
 
 int ufree(void *ptr) {
     BlockF *prev = NULL;
@@ -222,9 +247,6 @@ int ufree(void *ptr) {
     }
     return 0;
 }
-
-
-    
 
 void umemdump() {
     BlockF *cur = head;

@@ -20,7 +20,6 @@ void test_first_fit() {
     // Test Case 2: Initialize memory allocator with FIRST_FITT algorithm
     printf("Test Case 2: Initialize mem allocator with FIRST_FITT...\n");
     if (umeminit(4096, FIRST_FIT) != 0) {
-        printf("Initialization successful!\n");
     } else {
         printf("Test 2 Failed\n");
     }
@@ -31,7 +30,6 @@ void test_next_fit() {
     // Test Case 3: Initialize memory allocator with NEXT_FIT algorithm
     printf("Test Case 3: Initialize mem allocator with NEXT_FIT...\n");
     if (umeminit(4096, NEXT_FIT) != 0) {
-        printf("Initialization successful!\n");
     } else {
         printf("Test 3 Failed\n");
     }
@@ -53,12 +51,29 @@ void test_umalloc() {
     ufree(ptr);
 }
 
+void test_worst_fit() {
+    printf("Test Case 5: Initialize mem allocator with WORST_FIT...\n");
+    void *ptrs[6];
+    if (umeminit(4096, WORST_FIT) != 0) {
+        printf("Test 5 Failed\n");
+    } else {
+        ptrs[0] = umalloc(8192);
+        ptrs[1] = umalloc(4096);
+        ptrs[2] = umalloc(16384);
+        ptrs[3] = umalloc(1024);
+        ptrs[4] = umalloc(32);
+        ptrs[5] = umalloc(16);
+        umemdump();
+    }
+}
+
 int main() {
     void print_free_list(BlockF *list);
     test_umeminit();
     test_first_fit();
     test_next_fit();
     test_umalloc();
+    test_worst_fit();
 
     return 0;
 }

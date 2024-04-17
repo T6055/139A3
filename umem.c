@@ -87,8 +87,6 @@ void* NEXT_AFIT(size_t size) {
 }
 
 
-
-
 int umeminit(size_t sizeOfRegion, int allocationAlgo) {
     if (head != NULL || sizeOfRegion <= 0) {
         return -1;

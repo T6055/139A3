@@ -30,7 +30,6 @@ int umeminit(size_t sizeOfRegion, int allocationAlgo) {
     size_t pageSize = (size_t)PageSize; // Computer's page size
     size_t pages = sizeOfRegion / pageSize;
     size_t remainder = sizeOfRegion % pageSize;
-
     size_t allocateMem = 0; // Round up size_t to a certain page size
     if (remainder > 0)
         allocateMem = (pages + 1) * pageSize;

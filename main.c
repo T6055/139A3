@@ -7,6 +7,5 @@ int main() {
     umeminit (4096, -1); 
     umemdump(); 
     umalloc(100);
-
-    
+        
 }

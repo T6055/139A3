@@ -17,11 +17,28 @@ typedef struct BlockF {
 
 BlockF *head = NULL; // This is the head of the free list
 int AllAlgo = -1;    //stores the allocation algorithm that umalloc will use. It's initialized to -1.
+//BlockF *head = NULL;
+
+void Print(){
+    BlockF* temp = head;
+    printf("\n\nPRINT:\n");
+    while(temp){
+        printf("%p\n\t%p\n", temp, temp->free_next);
+        temp = temp->next;
+    }
+}
 
 void* BEST_AFIT(size_t size) {
-  void* ptr = NULL;
+  BlockF *cur = head;
+    BlockF *best = NULL;
 
-  return ptr;
+    while (cur != NULL) {
+        if (cur->size >= size && (best == NULL || cur->size < best->size)) {
+            best = cur;
+        }
+        cur = cur->next;
+    }
+    return best;
 } 
 
 void* WORST_AFIT(size_t size) {
@@ -81,12 +98,14 @@ void* FIRST_AFIT(size_t size) {
                 cur->size = size;
                 cur->free_next = NULL;
                 cur->next = newNode;
+                //printf("newNode: %p\n", newNode);
             }
 
             if (prev == NULL)
                 head = cur->next;
             else
                 prev->next = cur->next;
+            printf("alloc: %p\n", cur);
             return (void *)(cur + 1); // Pointer to the allocated memory
         }
         prev = cur;
@@ -105,6 +124,7 @@ void* NEXT_AFIT(size_t size) {
     while (1) {
         if (cur->size >= size) { // If the current block's size is ok to hold the requested sizeallocate from it
             head = cur; // Update the head of the free list to the current block
+            printf("next alloc: %p\n", cur);
             return (void *)(cur + 1); // Return a pointer to the allocated memory
         }
         cur = cur->next ? cur->next : head; 
@@ -141,8 +161,9 @@ int umeminit(size_t sizeOfRegion, int allocationAlgo) {
 
     head->size = umalMem - sizeof(BlockF);
     head->next = NULL;
+    head->free_next = NULL;
     AllAlgo = allocationAlgo;
-
+    printf("umeminit head: %p\n\tsize: %ld\n", head, head->size);
     return 0;
 }
 
@@ -178,10 +199,10 @@ void *umalloc(size_t size) {
     return block;
 }
 
-int ufree(void *ptr) {
+int ufree(void *ptr) { //THIS IS NOT COALESING 
     BlockF *prev = NULL;
     BlockF *nodeToFree = NULL;
-    BlockF *temp = NULL; 
+    //BlockF *temp = NULL; 
 
     if (ptr != NULL) {
         nodeToFree = (BlockF *)ptr - 1;
@@ -195,16 +216,56 @@ int ufree(void *ptr) {
 
         if (prev == NULL) {
             // Insert at the beginning
-            nodeToFree->free_next = head;
+            nodeToFree->free_next = head->free_next;
             head = nodeToFree;
         } else {
             // Insert in between or at the end
             nodeToFree->free_next = prev->free_next;
             prev->free_next = nodeToFree;
-        }
+            //
+            //
+            //
+            //
+            //
+            //
 
+            if(prev->next == nodeToFree){
+                // coalesce block before
+                prev->size += nodeToFree->size;
+                prev->free_next = nodeToFree->free_next;
+                prev->next = prev->next->next;
+                nodeToFree = prev;
+            }
+            //
+            //
+            //
+            //
+            //
+
+        }
+        //printf("head in ufree is: %p\n", head);
+
+        //
+        //
+        //
+        //
+        //
+        //
+        if(nodeToFree->next == nodeToFree->free_next){
+            //coalesce block after
+            nodeToFree->size += nodeToFree->free_next->size;
+            nodeToFree->next = nodeToFree->next->next;
+            nodeToFree->free_next = nodeToFree->free_next->free_next;
+            
+        }
+        //
+        //
+        //
+        //
+        //
+        //
         // Merge contiguous free blocks
-        temp = (BlockF*)((char*)head);
+        /*temp = (BlockF*)((char*)head);
         while (temp != NULL) {
             BlockF *nextBlock = temp->free_next;
             if (nextBlock == head->next) { // doesnt matter if the next head is free 
@@ -227,14 +288,15 @@ int ufree(void *ptr) {
                 prev =temp;
                 temp = temp->next;
             }
-        }
+        }*/
     }
 
-    // Coalesce with previous block if free
+    /*// Coalesce with previous block if free
     prev = head;
     temp = head;
     while (temp && temp->free_next) {
-        prev = prev->free_next;
+        if(prev->free_next)
+            prev = prev->free_next;
     }
     if (prev) {
         BlockF *nextBlock = temp->next;
@@ -242,7 +304,7 @@ int ufree(void *ptr) {
             prev->size += sizeof(BlockF) + nodeToFree->size;
             prev->free_next = nodeToFree->free_next;
         }
-    }
+    }*/
     return 0;
 }
 
@@ -251,8 +313,7 @@ void umemdump() {
     printf("Free Memory Dump:\n");
     //htpr = (header)
     while (cur != NULL) {
-        printf("Address: %p, Size: %zu\n", cur, cur->size);
+        printf("Address: %p, Size: %zu next: %p\n", cur, cur->size, cur->free_next);
         cur = cur->free_next;
     }
 }
-

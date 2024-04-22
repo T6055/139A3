@@ -222,12 +222,7 @@ int ufree(void *ptr) { //THIS IS NOT COALESING
             // Insert in between or at the end
             nodeToFree->free_next = prev->free_next;
             prev->free_next = nodeToFree;
-            //
-            //
-            //
-            //
-            //
-            //
+          
 
             if(prev->next == nodeToFree){
                 // coalesce block before
@@ -236,21 +231,12 @@ int ufree(void *ptr) { //THIS IS NOT COALESING
                 prev->next = prev->next->next;
                 nodeToFree = prev;
             }
-            //
-            //
-            //
-            //
-            //
+        
 
         }
         //printf("head in ufree is: %p\n", head);
 
-        //
-        //
-        //
-        //
-        //
-        //
+    
         if(nodeToFree->next == nodeToFree->free_next){
             //coalesce block after
             nodeToFree->size += nodeToFree->free_next->size;
@@ -258,12 +244,7 @@ int ufree(void *ptr) { //THIS IS NOT COALESING
             nodeToFree->free_next = nodeToFree->free_next->free_next;
             
         }
-        //
-        //
-        //
-        //
-        //
-        //
+        
         // Merge contiguous free blocks
         /*temp = (BlockF*)((char*)head);
         while (temp != NULL) {

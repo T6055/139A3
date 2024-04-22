@@ -15,14 +15,13 @@ int main() {
      //void print_free_list(BlockF *list);
     //test_umeminit();
     //test_first_fit();
-   // test_next_fit(); segmentation fault 
+   test_next_fit(); //segmentation fault 
     //test_umalloc();
     //test_worst_fit(); segmentation fault 
 
    umeminit(4096, 3);
 
     
-
     printf("%sTest 6%s: Freeing memory blocks at the beginning of the free list.\n", GRN, NRM);
     printf("There are no headers on free memory, so size is (requested value as 8B aligned) + 8.\n");
 
